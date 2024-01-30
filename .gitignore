@@ -1,2 +1,5 @@
-# PyCharm config
+# PyCharm CheMondis
 .idea/
+.venv/
+
+__pycache__/
