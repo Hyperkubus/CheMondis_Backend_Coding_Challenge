@@ -19,7 +19,7 @@ class OpenWeatherMapService(object):
     def __init__(self):
         self.apikey = os.environ['OPENWEATHERMAP_API_KEY']
 
-    def request(self, url: str):
+    def __request(self, url: str):
         response = requests.get(url)
         if (response.status_code == 200):
             return response.json()
@@ -35,7 +35,7 @@ class OpenWeatherMapService(object):
 
     def geocode(self, location: str, limit: int = 1):
         request_url = f'{self.base_url}/geo/1.0/direct?q={location}&limit={limit}&appid={self.apikey}'
-        data = self.request(request_url)
+        data = self.__request(request_url)
         if len(data) == 0:
             raise Exception('Location not found', location)
         if 'lat' not in data[0].keys() or 'lon' not in data[0].keys():
@@ -44,7 +44,7 @@ class OpenWeatherMapService(object):
 
     def weatherByLocation(self, location: City, units='metric'):
         request_url = f'{self.base_url}/data/2.5/weather?lat={location.lat}&lon={location.lon}&units={units}&appid={self.apikey}'
-        return self.request(request_url)
+        return self.__request(request_url)
 
     def weatherByCity(self, city: str):
         location = self.geocode(location=city)

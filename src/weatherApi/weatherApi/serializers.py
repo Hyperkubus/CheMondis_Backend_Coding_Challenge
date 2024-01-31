@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from weatherApi.models import WeatherData
+from .models import WeatherData
 
 
 class WeatherDataSerializer(serializers.ModelSerializer):
