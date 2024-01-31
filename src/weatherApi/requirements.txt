@@ -1,6 +1,7 @@
-django~=5.0.1
-djangorestframework~=3.14.0
+django
+djangorestframework
 drf-spectacular
 asyncio
 aiohttp
-requests~=2.31.0
+django-redis
+requests

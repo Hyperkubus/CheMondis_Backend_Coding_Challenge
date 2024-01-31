@@ -1,3 +1,6 @@
+import os
+
+from django.views.decorators.cache import cache_page
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
@@ -5,19 +8,11 @@ from .models import WeatherData
 from .serializers import WeatherDataSerializer
 from .services import OpenWeatherMapService
 
-
-def degToDirection(deg):
-    deg = deg % 360
-    if deg < 45 or deg > 315:
-        return 'North'
-    if deg < 135:
-        return 'East'
-    if deg < 225:
-        return 'South'
-    return 'West'
+CACHE_TTL = int(os.environ.get("CACHE_TTL", 500))
 
 
 @api_view(['GET'])
+@cache_page(CACHE_TTL)
 def weather_by_city(request, city):
     OWS = OpenWeatherMapService()
     city_data = OWS.geocode(city)
@@ -27,4 +22,4 @@ def weather_by_city(request, city):
         serializer = WeatherDataSerializer(weather, many=False)
         return Response(serializer.data)
 
-    return Response({"error":weather_data["message"]}, status=weather_data["cod"])
+    return Response({"error": weather_data["message"]}, status=weather_data["cod"])

@@ -7,9 +7,13 @@ services:
       - 8000:8000
     environment:
       - OPENWEATHERMAP_API_KEY=74c7c8083e6bffd2eb1efc4f2450b8a7
-      -
+      - REDIS_URL=redis://redis:6379/0
+      - CACHE_TTL=500
+    volumes:
+      - ./src/weatherApi:/weatherApi
+
   redis:
     restart: unless-stopped
     image: redis:7.0.5-alpine
-    expose:
-      - 6379
+    ports:
+      - 6379:6379
