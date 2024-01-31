@@ -1,0 +1,15 @@
+version: "3.0"
+services:
+  weatherapi:
+    build: .
+    container_name: weatherApi
+    ports:
+      - 8000:8000
+    environment:
+      - OPENWEATHERMAP_API_KEY=74c7c8083e6bffd2eb1efc4f2450b8a7
+      -
+  redis:
+    restart: unless-stopped
+    image: redis:7.0.5-alpine
+    expose:
+      - 6379
