@@ -3,8 +3,15 @@ import requests
 
 
 class OpenWeatherMapService(object):
+    __instance = None
+
     apikey: str = None
     base_url: str = 'http://api.openweathermap.org'
+
+    def __new__(cls):
+        if cls.__instance is None:
+            cls.__instance = super(OpenWeatherMapService, cls).__new__(cls)
+        return cls.__instance
 
     class City:
         name: str = None
@@ -42,8 +49,8 @@ class OpenWeatherMapService(object):
             raise Exception('Response is missing keys', data[0].keys)
         return self.City(data[0]['name'], data[0]['lat'], data[0]['lon'])
 
-    def weatherByLocation(self, location: City, units='metric'):
-        request_url = f'{self.base_url}/data/2.5/weather?lat={location.lat}&lon={location.lon}&units={units}&appid={self.apikey}'
+    def weatherByLocation(self, location: City, units='metric', lang='en'):
+        request_url = f'{self.base_url}/data/2.5/weather?lat={location.lat}&lon={location.lon}&units={units}&lang={lang}&appid={self.apikey}'
         return self.__request(request_url)
 
     def weatherByCity(self, city: str):
