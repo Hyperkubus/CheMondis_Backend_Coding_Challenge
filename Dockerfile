@@ -2,12 +2,16 @@ FROM python:latest
 
 ENV PYTHONUNBUFFERED 1
 
+RUN apt update
+RUN apt install gettext -y
+
 #COPY src/weatherApi /weatherApi
 VOLUME /weatherApi
 
 # Install any needed packages specified in requirements.txt
 WORKDIR /weatherApi
 COPY src/weatherApi/requirements.txt requirements.txt
+
 RUN pip install -r requirements.txt
 
 EXPOSE 8000

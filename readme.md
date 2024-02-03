@@ -27,4 +27,11 @@ This solution is crafted by utilizing the following technologies:
   - we are currently not storing any data in the database but might do later (e.g. city lookup)
 
 ### Configuration
-Application configuriation (Cache_TTL, etc.) can be found in `src/weatherApi/.env`
+Application configuration (Cache_TTL, etc.) can be found in `src/weatherApi/.env`
+
+### Tests
+Easiest way to run the tests is inside the docker:
+```
+docker exec -ti weatherApi /bin/bash
+pytest weatherApi/tests/integration_tests.py
+```

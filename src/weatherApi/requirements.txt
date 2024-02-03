@@ -6,3 +6,4 @@ aiohttp
 django-redis
 requests
 psycopg2
+pytest-django
