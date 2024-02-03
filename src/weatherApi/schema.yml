@@ -1,0 +1,102 @@
+openapi: 3.0.3
+info:
+  title: CheMondis Coding Challenge
+  version: 0.1.0
+  description: Rest API for CheMondis Coding Challenge which returns weather data
+    of a given city
+paths:
+  /weather/{city}/:
+    get:
+      operationId: weather_retrieve
+      parameters:
+      - in: path
+        name: city
+        schema:
+          type: string
+        required: true
+      tags:
+      - weather
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WeatherData'
+          description: ''
+components:
+  schemas:
+    WeatherData:
+      type: object
+      properties:
+        city_name:
+          type: string
+          maxLength: 180
+        city_longitude:
+          type: number
+          format: double
+        city_latitude:
+          type: number
+          format: double
+        current_temperature:
+          type: number
+          format: double
+        max_temperature:
+          type: number
+          format: double
+        min_temperature:
+          type: number
+          format: double
+        humidity:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+        pressure:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+        wind_speed:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+        wind_direction:
+          $ref: '#/components/schemas/WindDirectionEnum'
+        description:
+          type: string
+      required:
+      - city_latitude
+      - city_longitude
+      - city_name
+      - current_temperature
+      - description
+      - humidity
+      - max_temperature
+      - min_temperature
+      - pressure
+      - wind_speed
+    WindDirectionEnum:
+      enum:
+      - North
+      - East
+      - South
+      - West
+      type: string
+      description: |-
+        * `North` - North
+        * `East` - East
+        * `South` - South
+        * `West` - West
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: sessionid

@@ -1,5 +1,7 @@
 import os
 import requests
+from rest_framework.exceptions import NotAuthenticated, NotFound, Throttled, APIException, ValidationError, \
+    NotAcceptable
 
 
 class OpenWeatherMapService(object):
@@ -31,22 +33,26 @@ class OpenWeatherMapService(object):
         if (response.status_code == 200):
             return response.json()
         if (response.status_code == 401):
-            raise Exception('Invalid API key', response.status_code)
+            raise NotAuthenticated()
         if (response.status_code == 404):
-            raise Exception('Not Found', response.status_code)
+            raise NotFound()
         if (response.status_code == 429):
-            raise Exception('Rate Limit Reached', response.status_code)
+            raise Throttled()
         if (response.status_code >= 500):
-            raise Exception('Server Error', response.status_code)
-        raise Exception('Unexpected Error')
+            raise APIException(code=response.status_code, detail=response)
+        raise APIException()
 
-    def geocode(self, location: str, limit: int = 1):
+    def geocode(self, location: str, limit: int = 1, lang='en'):
         request_url = f'{self.base_url}/geo/1.0/direct?q={location}&limit={limit}&appid={self.apikey}'
         data = self.__request(request_url)
         if len(data) == 0:
-            raise Exception('Location not found', location)
+            raise NotFound()
         if 'lat' not in data[0].keys() or 'lon' not in data[0].keys():
-            raise Exception('Response is missing keys', data[0].keys)
+            raise ValidationError()
+        if "local_names" in data[0].keys():
+            if lang in data[0]['local_names'].keys():
+                print(data[0]['local_names'][lang])
+                return self.City(data[0]['local_names'][lang], data[0]['lat'], data[0]['lon'])
         return self.City(data[0]['name'], data[0]['lat'], data[0]['lon'])
 
     def weatherByLocation(self, location: City, units='metric', lang='en'):

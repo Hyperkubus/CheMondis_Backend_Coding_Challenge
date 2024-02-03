@@ -5,3 +5,4 @@ asyncio
 aiohttp
 django-redis
 requests
+psycopg2

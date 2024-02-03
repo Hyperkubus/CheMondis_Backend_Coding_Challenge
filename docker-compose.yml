@@ -4,16 +4,29 @@ services:
     build: .
     container_name: weatherApi
     ports:
-      - 8000:8000
-    environment:
-      - OPENWEATHERMAP_API_KEY=74c7c8083e6bffd2eb1efc4f2450b8a7
-      - REDIS_URL=redis://redis:6379/0
-      - CACHE_TTL=500
+      - 80:8000
+    env_file:
+      - ./src/weatherApi/.env
     volumes:
       - ./src/weatherApi:/weatherApi
+    depends_on:
+      - db
+      - redis
+
+  db:
+    image: postgres:12
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=weatherApi_user
+      - POSTGRES_PASSWORD=weatherApi_pass
+      - POSTGRES_DB=weatherApi
+    ports:
+      - 5432:5432
 
   redis:
     restart: unless-stopped
-    image: redis:7.0.5-alpine
-    ports:
-      - 6379:6379
+    image: redis:7.2.4
+
+volumes:
+  postgres_data:

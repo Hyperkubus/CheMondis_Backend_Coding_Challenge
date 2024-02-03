@@ -3,10 +3,10 @@ from django.db import models
 
 class WeatherData(models.Model):
     class WindDirection(models.TextChoices):
-        north = 'N', 'North'
-        east = "E", 'East'
-        south = 'S', 'South'
-        west = 'W', 'West'
+        north = 'North'
+        east = 'East'
+        south = 'South'
+        west = 'West'
 
     city_name = models.CharField(max_length=180)  # should fit bangkoks full name
     city_longitude = models.FloatField()
@@ -16,7 +16,7 @@ class WeatherData(models.Model):
     min_temperature = models.FloatField()
     humidity = models.PositiveSmallIntegerField()
     pressure = models.PositiveSmallIntegerField()
-    wind_speed = models.PositiveIntegerField()
+    wind_speed = models.PositiveSmallIntegerField()
     wind_direction = models.CharField(default=WindDirection.north, choices=WindDirection.choices, max_length=5)
     description = models.TextField()
     recorded_at = models.DateTimeField(auto_now_add=True)
@@ -25,14 +25,14 @@ class WeatherData(models.Model):
     @classmethod
     def create_from_openweathermap_data(cls, city, data):
         def degree_to_direction(deg):
-            deg = deg % 360
-            if deg < 45 or deg > 315:
-                return 'North'
-            if deg < 135:
+            deg = deg % 360 # We should not rely on the input to be in a sensible range
+            if 45 < deg < 135:
                 return 'East'
             if deg < 225:
                 return 'South'
-            return 'West'
+            if deg < 315:
+                return 'West'
+            return 'North'
 
         return cls(
             city_name=city.name,
