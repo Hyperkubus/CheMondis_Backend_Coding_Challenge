@@ -25,7 +25,7 @@ CACHE_TTL = int(os.environ.get("CACHE_TTL", 500))
     responses=WeatherDataSerializer,
 )
 @api_view(['GET'])
-#@cache_page(CACHE_TTL)
+@cache_page(CACHE_TTL)
 async def weather_by_city(request, city, format="json"):
     request_language = request.LANGUAGE_CODE.split('-')[0] or "en"
     owm_service = OpenWeatherMapService()
