@@ -1,5 +1,6 @@
 import os
 import requests
+import aiohttp
 from rest_framework.exceptions import NotAuthenticated, NotFound, Throttled, APIException, ValidationError, \
     NotAcceptable
 
@@ -28,23 +29,24 @@ class OpenWeatherMapService(object):
     def __init__(self):
         self.apikey = os.environ['OPENWEATHERMAP_API_KEY']
 
-    def __request(self, url: str):
-        response = requests.get(url)
-        if (response.status_code == 200):
-            return response.json()
-        if (response.status_code == 401):
-            raise NotAuthenticated()
-        if (response.status_code == 404):
-            raise NotFound()
-        if (response.status_code == 429):
-            raise Throttled()
-        if (response.status_code >= 500):
-            raise APIException(code=response.status_code, detail=response)
-        raise APIException()
+    async def __request(self, url: str):
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url) as response:
+                if response.status == 200:
+                    return await response.json()
+                if response.status == 401:
+                    raise NotAuthenticated()
+                if response.status == 404:
+                    raise NotFound()
+                if response.status == 429:
+                    raise Throttled()
+                if response.status >= 500:
+                    raise APIException(code=response.status, detail=response)
+                raise APIException()
 
-    def geocode(self, location: str, limit: int = 1, lang='en'):
+    async def geocode(self, location: str, limit: int = 1, lang='en'):
         request_url = f'{self.base_url}/geo/1.0/direct?q={location}&limit={limit}&appid={self.apikey}'
-        data = self.__request(request_url)
+        data = await self.__request(request_url)
         if len(data) == 0:
             raise NotFound()
         if 'lat' not in data[0].keys() or 'lon' not in data[0].keys():
@@ -55,10 +57,10 @@ class OpenWeatherMapService(object):
                 return self.City(data[0]['local_names'][lang], data[0]['lat'], data[0]['lon'])
         return self.City(data[0]['name'], data[0]['lat'], data[0]['lon'])
 
-    def weatherByLocation(self, location: City, units='metric', lang='en'):
+    async def weatherByLocation(self, location: City, units='metric', lang='en'):
         request_url = f'{self.base_url}/data/2.5/weather?lat={location.lat}&lon={location.lon}&units={units}&lang={lang}&appid={self.apikey}'
-        return self.__request(request_url)
+        return await self.__request(request_url)
 
-    def weatherByCity(self, city: str):
-        location = self.geocode(location=city)
-        return self.weatherByLocation(location=location)
+    async def weatherByCity(self, city: str):
+        location = await self.geocode(location=city)
+        return await self.weatherByLocation(location=location)
