@@ -31,7 +31,7 @@ async def weather_by_city(request, city, format="json"):
     owm_service = OpenWeatherMapService()
     city_data_task = asyncio.create_task(owm_service.geocode(city, lang=request_language))
     city_data = await city_data_task
-    weather_data_task = asyncio.create_task(owm_service.weatherByLocation(city_data, lang=request_language))
+    weather_data_task = asyncio.create_task(owm_service.weather_by_location(city_data, lang=request_language))
     weather_data = await weather_data_task
     weather = WeatherData.create_from_openweathermap_data(city_data, weather_data)
     serializer = WeatherDataSerializer(weather, many=False)

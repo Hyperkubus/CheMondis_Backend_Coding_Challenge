@@ -1,8 +1,6 @@
 import os
-import requests
 import aiohttp
-from rest_framework.exceptions import NotAuthenticated, NotFound, Throttled, APIException, ValidationError, \
-    NotAcceptable
+from rest_framework.exceptions import NotAuthenticated, NotFound, Throttled, APIException, ValidationError
 
 
 class OpenWeatherMapService(object):
@@ -57,10 +55,10 @@ class OpenWeatherMapService(object):
                 return self.City(data[0]['local_names'][lang], data[0]['lat'], data[0]['lon'])
         return self.City(data[0]['name'], data[0]['lat'], data[0]['lon'])
 
-    async def weatherByLocation(self, location: City, units='metric', lang='en'):
+    async def weather_by_location(self, location: City, units='metric', lang='en'):
         request_url = f'{self.base_url}/data/2.5/weather?lat={location.lat}&lon={location.lon}&units={units}&lang={lang}&appid={self.apikey}'
         return await self.__request(request_url)
 
-    async def weatherByCity(self, city: str):
+    async def weather_by_city(self, city: str):
         location = await self.geocode(location=city)
-        return await self.weatherByLocation(location=location)
+        return await self.weather_by_location(location=location)
